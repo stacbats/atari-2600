@@ -1,0 +1,20 @@
+
+; F5 to run or compile and run below
+
+	include "vcs.h"
+	include "macro.h"
+
+    processor 6502
+    seg Code        ; define a new segment "code"
+    org $f000       ; define the origin of the ROM
+
+Start:
+
+
+    lda #82
+    ldx 82
+    ldy $82
+
+    org $fffc
+    .word Start     ; put 2 bytes with reset address at memory position $FFFC
+    .word Start     ; put 2 bytes with reset address at memory position $FFFE
