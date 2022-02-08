@@ -1,0 +1,19 @@
+    processor 6502
+    seg code
+    org $f000
+
+Start:
+
+    lda #100        ; Load A with 100
+    clc             ; clear the carry flag (always do this)
+    adc #5          ; Add with carry 5 to accumulator
+    sec             ; Set the carry (always do this before calling SBC -Suntract with carry)
+
+    sbc #10
+
+    jmp Start 
+
+
+    org $fffc
+    .word Start     ; put 2 bytes with reset address at memory position $FFFC
+    .word Start     ; put 2 bytes with reset address at memory position $FFFE

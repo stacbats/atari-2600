@@ -7,10 +7,24 @@
     seg Code        ; define a new segment "code"
     org $f000       ; define the origin of the ROM
 Start:
-    lda #$a
-    ldx %11111111
-    sta $80
-    stx $81
+
+    lda #15
+
+    tax
+    tay
+    txa
+    tya
+
+    lda #6
+    ;       You can't transfer X to Y or Y to X
+    ;       to do this you would need to go through the accumulator
+    ;       like below.
+    txa
+    tay
+
+    jmp Start
+
+
 
     org $fffc
     .word Start     ; put 2 bytes with reset address at memory position $FFFC
