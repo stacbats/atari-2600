@@ -1,0 +1,17 @@
+; This ixercise is around adding and subtracting
+
+    processor 6502
+    seg code
+    org $f000
+
+Start:
+    lda #10
+    sta $80
+
+    inx $80
+    dex $80
+
+
+    org $fffc
+    .word Start     ; put 2 bytes with reset address at memory position $FFFC
+    .word Start     ; put 2 bytes with reset address at memory position $FFFE

@@ -1,0 +1,22 @@
+; Loops with adding and subtracting
+
+
+    processor 6502
+    seg code
+    org $f000
+
+Start:
+
+    ldy #10     ; load Y with 10
+
+Loop:           ; Our Label for the loop
+    tya         ; Transfer Y into Accumulator
+    sta $80,y   ; store Y at address $80+y
+    dey         ; decrement Y
+    bpl Loop    ; branch plus (result of instruction if positive)
+
+    jmp Start
+
+    org $fffc
+    .word Start     ; put 2 bytes with reset address at memory position $FFFC
+    .word Start     ; put 2 bytes with reset address at memory position $FFFE

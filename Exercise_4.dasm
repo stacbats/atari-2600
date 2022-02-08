@@ -1,3 +1,13 @@
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ; ADC & SBC
+    ; Adding with 6502 is always done with CLC
+    ; CLC
+    ; ADC **
+    ; Subtracting is always done with SEC
+    ; SEC
+    ; SBC **
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+ 
     processor 6502
     seg code
     org $f000
@@ -5,15 +15,20 @@
 Start:
 
     lda #100        ; Load A with 100
-    clc             ; clear the carry flag (always do this)
+    clc             ; clear the carry flag (always do this ALWAYS)
     adc #5          ; Add with carry 5 to accumulator
+                    ; the combined value is now #105
     sec             ; Set the carry (always do this before calling SBC -Suntract with carry)
 
-    sbc #10
+    sbc #10         ; subtracting the value from register ,should have #95 now
 
-    jmp Start 
+    jmp Start       ; A loop to continue
 
 
     org $fffc
     .word Start     ; put 2 bytes with reset address at memory position $FFFC
     .word Start     ; put 2 bytes with reset address at memory position $FFFE
+
+
+    ; Use 8bit Workshop to utilise monitor and step through process, viewing
+    ; addition and subtraction as well as the changes in flags

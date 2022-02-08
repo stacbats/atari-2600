@@ -1,0 +1,27 @@
+; This ixercise is around adding and subtracting
+
+    processor 6502
+    seg code
+    org $f000
+
+Start:
+    lda #$a         ; load A with hex A (10)
+    ldx #%1010       ; load X with binary 1010 (10)
+                    ; loading 10 into A & X
+    sta $80         ; Storing A at address
+    stx $81         ; Storing X at address
+
+    lda #10         ; load A with 10 again
+    clc
+    adc $80
+    adc $81
+
+    sta $82
+
+    jmp Start
+
+
+
+    org $fffc
+    .word Start     ; put 2 bytes with reset address at memory position $FFFC
+    .word Start     ; put 2 bytes with reset address at memory position $FFFE
