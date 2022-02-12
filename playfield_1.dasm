@@ -1,0 +1,122 @@
+	processor 6502
+
+    include "vcs.h"
+	include "macro.h"
+
+	seg 
+    org $f000
+
+Reset:
+	CLEAN_START      ; call macro to safely clear RAM and TIA
+
+    ldx #$ac        ; background colour
+    stx COLUBK  
+
+    lda #$38         ; playfield colour
+    sta COLUPF
+
+; Start a new frame
+; putting the frame onto screen
+StartFrame:
+    lda #02
+    sta VBLANK
+    sta VSYNC
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Now lets set up the rules to generate the playing field
+    REPEAT 3
+        sta WSYNC       ; three scanlines for VSYNC
+    REPEND
+    lda #0              ;  load accumulator wit hzero
+    sta VSYNC           ; Turn off VSync
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 1st up generate three lines of VSYNC
+    REPEAT 37
+        sta WSYNC       ; three scanlines for VSYNC
+    REPEND
+    lda #0              ;  load accumulator wit hzero
+    sta VBLANK          ; Turn off VSync
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; 2nd, creat 37 lines  of VBLANK
+    ldx #%00000001
+    stx CTRLPF
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+; Lets draw the background now 
+
+    ; ********  Skip 1st 7
+    ldx #0
+    stx PF0
+    stx PF1
+    stx PF2
+    REPEAT 3    ; ** remember to add 3
+        sta WSYNC
+    REPEND
+
+    ; ******** Set PF0 to 1110 and PF1 & 2 as 1111 1111
+    ldx #%11100000
+    stx PF0
+    ldx #%10111111
+    stx PF1
+    stx PF2
+    REPEAT 7
+        sta WSYNC
+    REPEND
+    ; ********  Skip 1st 7
+    ldx #0
+    stx PF0
+    stx PF1
+    stx PF2
+    REPEAT 7
+        sta WSYNC
+    REPEND
+    ; ******** Set next 164 with only 3rd bit set
+    ldx #%00100000
+    stx PF0
+    ldx #0
+    stx PF1
+    stx PF2
+    REPEAT 167
+        sta WSYNC
+    REPEND
+
+    ; ******** Set PF0 to 1110 and PF1 & 2 as 1111 1111
+    ldx #%11100000
+    stx PF0
+    ldx #%11110111
+    stx PF1
+    stx PF2
+    REPEAT 7
+        sta WSYNC
+    REPEND
+    ; ********  Skip 1st 7
+    ldx #0
+    stx PF0
+    stx PF1
+    stx PF2
+    REPEAT 7
+        sta WSYNC
+    REPEND
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;       Output 30 more VBLANK overscans to complete our frame
+    lda #2
+    sta VBLANK
+    REPEAT 30
+        sta WSYNC
+    REPEND
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;       Loop the frame
+    jmp StartFrame
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;       Complete my ROM size to 4KB
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+	org $fffc
+	.word Reset
+	.word Reset
