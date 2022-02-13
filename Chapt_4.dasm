@@ -17,13 +17,14 @@ Start:  sei
         ldx #$ff
         txs
 
-    lda #0
-    ldx #$ff
-ZeroZP: sta $0,X
-    dex
-    bne ZeroZP
+        lda #0
+        ldx #$ff
 
-    lda #$30
+ZeroZP: sta $0,X
+        dex
+        bne ZeroZP
+
+    lda #$35
     sta COLUBK
  
     jmp Start
