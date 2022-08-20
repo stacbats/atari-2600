@@ -1,0 +1,74 @@
+	processor 6502      ; Define processor
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+	include "vcs.h"             ; Will load external file into our code.
+	include "macro.h"           ; Will load external file into our code.
+; The above will pull in the code we will use in programs
+
+	seg code                    ; This is the start of our code segment
+	org $F000                   ; Gives us ethe Rom Origin, starting at  $F000
+
+START:
+    CLEAN_START                 ; Its the Macro that cleans all memory (TIA PIA etc.)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+NEXTFRAME:
+    lda #2                      ; Binary 00000010
+    sta VBLANK                  ; Turn on Vblank
+    sta VSYNC                   ; Turn on Vsync
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   Now lets start a new frame, the 1st three WSYNC Lines
+    sta WSYNC       ; 1st Line
+    sta WSYNC       ; 2nd Line
+    sta WSYNC       ; 3rd Line
+
+    lda #0          ; Load A with 0
+    sta VSYNC       ; Turn off Vsync
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   Lets create 37 scanlines for TIA
+
+    ldx #37                     ; X now = 37(our counter)
+LOOPVBlank:                     ; Create a Label
+    sta WSYNC                   ; Start the 1st Wsync
+    dex                         ; Decrememnt by 1
+    bne LOOPVBlank              ; Jump back to lable if  not 0
+
+    lda #0                      ; Load A with 0
+    sta VBLANK                  ; Lets turn VBlank off
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   Now to render the Visable Screen
+
+    ldx #192
+LOOP2ScanLine:
+    stx COLUBK          ; Set the Background colour 
+    sta WSYNC           ; Wait for the next Scanline
+    dex 
+
+    bne LOOP2ScanLine
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;   Now for the Overscan, 30 more VBLANK lines
+    lda #2                      ; lets turn Vblank back on
+    sta VBLANK
+    ldx #30                     ; Set X as 30 for the Overscan
+LOOPOVERSCAN:                   ; Label
+    sta WSYNC                   ; wait for next scanline
+    dex                         ; Decrement
+    bne LOOPOVERSCAN            ; If not 0 then branch back to label
+
+    jmp NEXTFRAME
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;   Fill the Rom size to exactly 4kb  ***   COMPLETE THE ROM SIZE   ***
+    org $fffc                   ; Define the origin to the address $fffc
+    .word   START               ; Reset Vector at $fffc(start of prg)
+    .word   START               ; Interupt Vector also at $fffc (unused in VCS)
+
+; The VCS SCREEN pn a CRT 
+; - 3 scanlines of VSYNC
+; - 37 blank lines
+; - 192 visible scanlines
+; - 30 blank lines
