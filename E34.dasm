@@ -75,9 +75,9 @@ StartFrame:
     REPEND
 
     ; Set the next 164 lines only with PF0 third bit enabled
-    ldx #%00100000
+    ldx #%01010000          ;   #%00100000   
     stx PF0
-    ldx #0
+    ldx #1
     stx PF1
     stx PF2
     REPEAT 164
